@@ -4,8 +4,21 @@ import bodyParser from "body-parser";
 import { RegisterRoutes } from "../build/routes";
 import { ValidateError } from "tsoa";
 import NotFoundError from "./common/errors/notFoundError";
+import { container } from "tsyringe";
+import { DatabaseConfig } from "./common/database";
 
 export const app = express();
+
+container.registerInstance(
+  DatabaseConfig,
+  new DatabaseConfig(
+    process.env.PGHOST || "localhost",
+    process.env.PGPORT || "5432",
+    process.env.PGDATABASE || "todos",
+    process.env.PGUSER || "postgres",
+    process.env.PGPASS || "postgres"
+  )
+);
 
 // Use body parser to read sent json payloads
 app.use(
@@ -14,6 +27,12 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+
+RegisterRoutes(app);
+
+app.use("/docs", swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
+  return res.send(swaggerUi.generateHTML(await import("../build/swagger.json")));
+});
 
 app.use(function errorHandler(err: unknown, req: ExRequest, res: ExResponse, next: NextFunction): ExResponse | void {
   if (err instanceof ValidateError) {
@@ -33,10 +52,4 @@ app.use(function errorHandler(err: unknown, req: ExRequest, res: ExResponse, nex
   }
 
   next();
-});
-
-RegisterRoutes(app);
-
-app.use("/docs", swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
-  return res.send(swaggerUi.generateHTML(await import("../build/swagger.json")));
 });

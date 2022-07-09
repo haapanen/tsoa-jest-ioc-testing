@@ -12,20 +12,20 @@ export class TodoController extends Controller {
 
   @Get("")
   public async getTodos(): Promise<Todo[]> {
-    return this.todoService.getTodos();
+    return await this.todoService.getTodos();
   }
 
   @Post("")
   @SuccessResponse("201", "Created")
   public async createTodo(@Body() parameters: CreateTodoParameters): Promise<void> {
     this.setStatus(201);
-    this.todoService.createTodo(parameters);
+    await this.todoService.createTodo(parameters);
   }
 
   @Put("{todoId}")
   @SuccessResponse("204", "Updated")
   public async updateTodo(@Path() todoId: number, @Body() todo: Todo): Promise<void> {
     this.setStatus(204);
-    this.todoService.updateTodo(todoId, todo);
+    await this.todoService.updateTodo(todoId, todo);
   }
 }

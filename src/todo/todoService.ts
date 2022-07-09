@@ -1,4 +1,5 @@
 import { singleton } from "tsyringe";
+import { Database } from "../common/database";
 import NotFoundError from "../common/errors/notFoundError";
 import { Todo } from "./todo";
 
@@ -6,25 +7,40 @@ export type CreateTodoParameters = Pick<Todo, "description" | "done" | "title">;
 
 @singleton()
 export class TodoService {
-  private nextFreeId = 1;
-  private todos: Todo[] = [];
+  constructor(private readonly database: Database) {}
 
-  public getTodos(): Todo[] {
-    return this.todos;
+  public async getTodos(): Promise<Todo[]> {
+    const todos = await this.database.sql<Todo[]>`
+        select 
+            id,
+            title,
+            description,
+            done
+        from todos;
+    `;
+
+    return todos;
   }
 
-  public createTodo(parameters: CreateTodoParameters) {
-    this.todos.push({
-      ...parameters,
-      id: this.nextFreeId++,
-    });
+  public async createTodo(parameters: CreateTodoParameters) {
+    const [createdTodo] = await this.database.sql<Todo[]>`
+        insert into todos ${this.database.sql(parameters)}
+        returning id, title, description, done
+    `;
   }
 
-  public updateTodo(todoId: number, todo: Todo) {
-    const todoIdx = this.todos.findIndex((t) => t.id === todoId);
-    if (todoIdx < 0) {
-      throw new NotFoundError();
+  public async updateTodo(todoId: number, todo: Todo) {
+    const result = await this.database.sql`
+        update todos set ${this.database.sql(
+          todo,
+          "title",
+          "description",
+          "done"
+        )} where id = ${todoId} returning 1 as updated
+    `;
+
+    if (result.length === 0) {
+      throw new NotFoundError(`No todo found with id ${todoId}`);
     }
-    this.todos[todoIdx] = todo;
   }
 }
