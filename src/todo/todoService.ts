@@ -1,11 +1,11 @@
-import { singleton } from "tsyringe";
+import { Lifecycle, scoped } from "tsyringe";
 import { Database } from "../common/database";
 import NotFoundError from "../common/errors/notFoundError";
 import { Todo } from "./todo";
 
 export type CreateTodoParameters = Pick<Todo, "description" | "done" | "title">;
 
-@singleton()
+@scoped(Lifecycle.ContainerScoped)
 export class TodoService {
   constructor(private readonly database: Database) {}
 

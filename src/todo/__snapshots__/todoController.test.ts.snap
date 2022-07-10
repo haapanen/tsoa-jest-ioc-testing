@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Todos API Should create a todo 1`] = `
+Object {
+  "description": "description",
+  "done": false,
+  "id": Any<Number>,
+  "title": "title",
+}
+`;

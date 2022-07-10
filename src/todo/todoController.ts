@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Path, Post, Put, Route, SuccessResponse } from "tsoa";
-import { singleton } from "tsyringe";
+import { Lifecycle, scoped } from "tsyringe";
 import { Todo } from "./todo";
 import { CreateTodoParameters, TodoService } from "./todoService";
 
-@singleton()
+@scoped(Lifecycle.ContainerScoped)
 @Route("api/v1/todos")
 export class TodoController extends Controller {
   constructor(private readonly todoService: TodoService) {

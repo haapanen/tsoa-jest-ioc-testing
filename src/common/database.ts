@@ -1,4 +1,4 @@
-import { singleton } from "tsyringe";
+import { Lifecycle, scoped } from "tsyringe";
 import postgres from "postgres";
 
 export class DatabaseConfig {
@@ -11,7 +11,7 @@ export class DatabaseConfig {
   ) {}
 }
 
-@singleton()
+@scoped(Lifecycle.ContainerScoped)
 export class Database {
   sql: postgres.Sql<{}>;
 

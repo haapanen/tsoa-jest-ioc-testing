@@ -4,8 +4,8 @@ import bodyParser from "body-parser";
 import { RegisterRoutes } from "../build/routes";
 import { ValidateError } from "tsoa";
 import NotFoundError from "./common/errors/notFoundError";
-import { container } from "tsyringe";
 import { DatabaseConfig } from "./common/database";
+import { container } from "./ioc";
 
 export const app = express();
 
